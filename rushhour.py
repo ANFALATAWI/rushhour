@@ -92,17 +92,15 @@ def load_file(rushhour_file):
         vehicles.append(Vehicle(id, int(x), int(y), orientation))
     return RushHour(set(vehicles))
 
-def breadth_first_search(r, max_depth=25):
+def breadth_first_search(r, firstSolution, max_depth=25):
     """
     Find solutions to given RushHour board using breadth first search.
     Returns a dictionary with named fields:
         visited: the number of configurations visited in the search
         solutions: paths to the goal state
         depth_states: the number of states visited at each depth
-
     Arguments:
         r: A RushHour board.
-
     Keyword Arguments:
         max_depth: Maximum depth to traverse in search (default=25)
     """
@@ -128,6 +126,10 @@ def breadth_first_search(r, max_depth=25):
 
         if board.solved():
             solutions.append(new_path)
+            if firstSolution:
+                return {'visited': visited,
+                        'solutions': solutions,
+                        'depth_states': depth_states}
         else:
             queue.extendleft((move, new_path) for move in board.moves())
 
@@ -157,10 +159,11 @@ if __name__ == '__main__':
     with open(filename) as rushhour_file:
         rushhour = load_file(rushhour_file)
 
-    results = breadth_first_search(rushhour, max_depth=100)
+    results = breadth_first_search(rushhour, max_depth=100, firstSolution = True)
 
     print '{0} Solutions found'.format(len(results['solutions']))
     for solution in results['solutions']:
         print 'Solution: {0}'.format(', '.join(solution_steps(solution)))
 
     print '{0} Nodes visited'.format(len(results['visited']))
+    print 'depth_states: {0}'.format(len(results['depth_states']))
